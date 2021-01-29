@@ -1,0 +1,6 @@
+# This is purely informative
+apiVersion: v2
+appVersion: "1.0"
+description: A sorta fake helm chart showing how you can perform values inheritance
+name: block-hax0rz
+version: 0.1.0

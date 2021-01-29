@@ -1,0 +1,34 @@
+---
+# This example is purely informative
+# This would live here statically for all clusters since the values file generated passes in everything
+
+{{- range $index, $cluster := .Values.clusters }}
+{{- $class := $cluster.class }}
+{{- $endpoint := $cluster.kubeApiEndpoint }}
+{{- $env := $cluster.env }}
+{{- $fqdn := $cluster.clusterFQDN }}
+{{- $name := $cluster.clusterShortName }}
+{{- $revision := $cluster.revision }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    k8s-app: external-dns
+  name: {{ $name }}-external-dns
+  namespace: argocd
+spec:
+  destination:
+    namespace: external-dns
+    server: {{ $endpoint }}
+  project: {{ $name }}-core-services
+  source:
+    path: .
+    repoURL: git@github.com:matoszz/blog.git
+    helm:
+      values: |-
+        class: {{ $class }}
+        clusterFQDN: {{ $fqdn }}
+        clusterShortName: {{ $name }}
+        env: {{ $env }}
+    targetRevision: {{ $revision }}
+{{- end }} # end range

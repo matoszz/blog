@@ -1,0 +1,38 @@
+---
+# This is purely informative
+all:
+  children:
+    cluster_short_name:
+      hosts:
+        cluster_short_name-01:
+          ansible_host:
+          host_meta_internal_ipv4:
+          host_meta_external_ipv4:
+          host_meta_external_ipv6:
+          host_meta_mac_primary:
+          host_meta_mac_secondary:
+# truncating hosts for readability
+      vars:
+        k8s_cluster_class:
+        k8s_cluster_environment:
+        k8s_cluster_facility:
+        k8s_cluster_version: "v1.20.2"
+        k8s_cluster_api_vip_addr:
+        k8s_cluster_metallb_private_ip_pools:
+          -
+        k8s_cluster_metallb_public_ip_pools:
+          -
+        k8s_cluster_metallb_additional_pools:
+          - name: pool_name
+            pools:
+              -
+    kube_controllers:
+      hosts:
+        cluster_short_name-01:
+        cluster_short_name-02:
+        cluster_short_name-03:
+    kube_workers:
+      hosts:
+        cluster_short_name-04:
+        cluster_short_name-05:
+        cluster_short_name-06:

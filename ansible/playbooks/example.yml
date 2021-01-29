@@ -1,0 +1,17 @@
+---
+# This is purely informative
+- hosts:
+    - kube_controllers[0]
+  roles:
+    - role: firewalls
+      tags:
+        - firewalls
+    - role: metadata_collector
+      tags:
+        - metadata_collector
+    - role: argo
+      tags:
+        - argo
+    - role: physical_inventory
+      tags:
+        - physical_inventory

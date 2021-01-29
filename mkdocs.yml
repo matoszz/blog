@@ -1,0 +1,32 @@
+# This is purely informative; it's intended to serve as an example and not be fully functional
+site_name: Multi cluster example
+site_author: matoszz
+dev_addr: 0.0.0.0:8000
+repo_name: blog
+repo_url: git@github.com:matoszz/blog.git
+
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+nav:
+  - Home: index.md
+  - Cluster Inventory:
+#ansible_managed
+      - cluster-short-name: cluster_inventory/cluster_short_name.md
+
+markdown_extensions:
+# removing the list for readability
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      type: date
+  - minify:
+      minify_html: true

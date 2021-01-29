@@ -1,0 +1,31 @@
+---
+# This is purely informative
+- name: Write new values file for the cluster
+  delegate_to: localhost
+  become: false
+  run_once: true
+  template:
+    src: values.yml.j2
+    dest: "../../cluster-services/values-{{ k8s_cluster_name }}.yaml"
+    mode: '0644'
+    force: yes
+
+- name: Write new inventory file for the cluster # html is cool I don't care what you think
+  delegate_to: localhost
+  become: false
+  run_once: true
+  template:
+    src: physical-inventory.yml.j2
+    dest: '../../docs/cluster_inventory/{{ k8s_cluster_name|replace("-", "_") }}.md' # obv not hard required to change file name
+    mode: '0644'
+    force: yes
+
+- name: Write new app of apps file for the cluster
+  delegate_to: localhost
+  become: false
+  run_once: true
+  template:
+    src: appofapps.yml.j2
+    dest: "../../app-of-apps/{{ k8s_cluster_name }}-services.yaml"
+    mode: '0644'
+    force: yes

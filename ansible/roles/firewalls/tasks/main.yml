@@ -1,0 +1,61 @@
+---
+# This is purely informative; you'd modify to suit purpose
+- name: Query netbox for all facility aggregate blocks
+  delegate_to: localhost
+  become: false
+  run_once: true
+  uri:
+    url: "https://your.netbox.url/api/ipam/prefixes?role=site-aggregate&family=4&limit=5000"
+    method: GET
+    return_content: yes
+    headers:
+      Authorization: "Token {{ netbox_api_token }}"
+    status_code: 200
+  register: all_fac_agg
+
+- name: Facts on Facts # you'd use whatever fits your use case for netbox; may not be site
+  delegate_to: localhost
+  become: false
+  run_once: true
+  set_fact:
+    site_code: "{{ all_fac_agg.json.results|json_query('[*].{site: site.slug, prefix: prefix}')|list }}"
+    all_fac_aggregates_ipv4: "{{ all_fac_agg.json.results|map(attribute='prefix')|list }}"
+
+- name: Pull out unique facilities and group # don't judge me
+  run_once: true
+  set_fact:
+    site_prefixes: "{{ site_prefixes|default({}) | combine({item : ( site_code | json_query(site_query)) } ) }}"
+  loop: "{{ site_code | json_query('[*].site') | unique }}"
+  vars:
+    site_query: "[?site == '{{ item }}'].prefix"
+
+- name: Merge netbox facts # you have to create facts like this because of ansible-ness
+  delegate_to: localhost
+  when: site_prefixes is defined
+  become: false
+  run_once: true
+  set_fact:
+    firewalls: {
+          "netboxCIDRS": "{{ site_prefixes }}",
+          "trustedCIDRs": "{{ baseCIDRs.trustedCIDRs }}",
+        }
+
+- name: Write all facility aggregate values # the values are empty because you can use argo apps to pass in extra infos
+  when: firewalls is defined
+  delegate_to: localhost
+  become: false
+  run_once: true
+  copy:
+    content: |
+      ---
+      # This is purely informative, god speed with the copy pasta
+
+      location: ''
+      class: ''
+      env: ''
+      clusterHostIPs: ''
+      subclass: ''
+      clusterShortName: ''
+
+      {{ firewalls | to_nice_yaml(indent=2) }}
+    dest: "../../firewalls/values.yaml" # no need for per cluster values in this example, but nothing to say you couldn't

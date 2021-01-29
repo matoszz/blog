@@ -1,0 +1,20 @@
+---
+{{- $location := .Values.location }}
+{{- if eq .Values.class "submarine" }}
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: block-hax0rz
+  namespace: ingress-nginx
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEntities:
+    - cluster
+  - fromCIDR:
+{{- range $s, $fac := .Values.netboxCIDRS }}
+{{- if eq $location $s }}
+{{ toYaml $fac | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

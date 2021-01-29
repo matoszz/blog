@@ -1,0 +1,3 @@
+---
+argo_jwt_token_prod: !vault |
+# You would use ansible-vault to encrypt your jwt token and stash it here

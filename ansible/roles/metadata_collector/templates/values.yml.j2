@@ -1,0 +1,36 @@
+---
+clusters:
+    class: {{ k8s_cluster_class }}
+{% if k8s_cluster_subclass is defined %}
+    subclass: {{ k8s_cluster_subclass  }}
+{% else %}
+    subclass: ""
+{% endif %}
+    clusterFQDN: {{ k8s_cluster_fqdn }}
+    clusterShortName: {{ k8s_cluster_name }}
+    env: {{ k8s_cluster_environment }}
+    kubevip: {{ k8s_cluster_endpoint.split(":")[0] }}
+    apiport: {{ k8s_cluster_endpoint.split(":")[1] }}
+    location: {{ k8s_cluster_facility }}
+    metallb_private_ip_pools:
+{% for ip in k8s_cluster_metallb_private_ip_pools %}
+      - {{ ip }}
+{% endfor %}
+    metallb_public_ip_pools:
+{% for ip in k8s_cluster_metallb_public_ip_pools %}
+      - {{ ip }}
+{% endfor %}
+    metallb_peers:
+    - peer_address: 127.0.0.1
+      peer_asn: {{ bird_metallb_local_asn }}
+      my_asn: {{ bird_metallb_peer_asn }}
+{% if k8s_cluster_metallb_additional_pools is defined %}
+    metallb_additional_pools:
+{% for pool in k8s_cluster_metallb_additional_pools %}
+    - name: {{ pool.name }}
+      pools:
+{% for ip in pool.pools %}
+      - {{ ip }}
+{% endfor %}
+{% endfor %}
+{% endif %}

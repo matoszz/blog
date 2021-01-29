@@ -1,0 +1,24 @@
+---
+# This example is purely informative; several additional components would be needed for this to actually function
+
+ansible_python_interpreter: "/root/bin/python"
+kube_version: "{{ k8s_cluster_version }}"
+
+# Kubernetes Cluster Default values
+# cluster defaults
+k8s_cluster_ha: "{{ true if groups.kube_controllers | length > 1 else false }}"
+k8s_cluster_name: "{{ k8s_cluster_class }}{{ whatever else you'd want }}"
+k8s_cluster_api_vip_port: "1234"
+# node defaults
+k8s_node_internal_ip: "{{ ansible_all_ipv4_addresses | difference([k8s_cluster_api_vip_addr | default('')]) | ipaddr('10.0.0.0/8') | first }}"
+k8s_node_api_addr: "{{ k8s_node_internal_ip }}"
+k8s_node_api_port: "{{ '1234' }}"
+k8s_node_name: "{{ inventory_hostname }}"
+# fancy domains be fancy
+k8s_cluster_endpoint: "{{ k8s_cluster_api_vip_addr if k8s_cluster_ha else hostvars[groups.kube_controllers[0]]['k8s_node_api_addr'] }}:{{ k8s_cluster_api_vip_port if k8s_cluster_ha else k8s_node_api_port }}"
+domain_tld: "{{ 'yourfancydomain.net' if k8s_cluster_environment == 'prod' else 'lessfancy.gov' }}"
+domain_subdomain: "{{ k8s_cluster_class }}{{ '-' + k8s_cluster_subclass if k8s_cluster_subclass is defined }}-{{ whatever else you want }}"
+k8s_cluster_fqdn: "{{ domain_subdomain }}.{{ k8s_cluster_facility }}.{{ domain_tld }}"
+
+# argo defaults
+argo_server_prod: https://argo.atyourdomain.net

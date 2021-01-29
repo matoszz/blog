@@ -1,0 +1,8 @@
+---
+netbox_api_token: !vault |
+# you'd stash your netbox token here via ansible-vault
+
+baseCIDRs:
+  trustedCIDRs:
+  - 10.0.0.0/8 # if you wanted to include
+  # plus site aggregate - if you don't use sites in netbox, you can use racks or whatever

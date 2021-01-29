@@ -1,0 +1,21 @@
+---
+- name: Ensure argo CLI installed
+  get_url: # you'd add variables or change versions depending on need
+    url: https://github.com/argoproj/argo-cd/releases/download/v1.7.6/argocd-linux-amd64
+    dest: "{{ bin_dir }}/argocd"
+    owner: root
+    group: root
+    mode: 0755
+    force: yes
+  when: k8s_cluster_class != "submarine" # purely informative; would match to desired class
+
+- name: Add cluster to Argocd # noqa 301
+  run_once: true
+  when: k8s_cluster_class != "submarine" # purely informative; would match to desired class
+  delegate_to: "{{ groups['kube_controllers'][0] }}"
+  register: cluster_added
+  environment:
+    ARGOCD_AUTH_TOKEN: '{{ argo_jwt_token }}'
+    KUBECONFIG: /etc/kubernetes/admin.conf
+    ARGOCD_CONFIG: "{{ bin_dir }}/argocd"
+  command: "argocd --grpc-web cluster add kubernetes-admin@'{{ k8s_cluster_name }}' --server {{ argo_server }} --upsert --name {{ k8s_cluster_name }}"

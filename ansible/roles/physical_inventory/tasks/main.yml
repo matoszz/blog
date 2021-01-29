@@ -1,0 +1,36 @@
+---
+# This is purely informative, and possibly a mildly a gross example on how to do this
+- name: Get list of clusters in the inventory but exclude the index
+  find:
+    paths: '../../docs/cluster_inventory'
+    patterns: '*md'
+    recurse: no
+    exclude: 'README.md'
+  delegate_to: localhost
+  become: false
+  run_once: true
+  register: inventory
+
+- name: Set cluster inventory fact
+  set_fact:
+    cluster_inventory: "{{ inventory.files | map(attribute='path') | map('regex_replace','^.*/(.*)$','\\1') | sort(reverse = True) }}"
+
+- name: Burn the old clusters # remove all previous entries in the file so we don't need to mess with diffs
+  delegate_to: localhost
+  become: false
+  run_once: true
+  lineinfile:
+    path: '../../mkdocs.yml'
+    regexp: '(.*)cluster_inventory(.*)$'
+    state: absent
+
+- name: Long live the new clusters # write out all the new clusters after the ansible managed location
+  delegate_to: localhost
+  become: false
+  run_once: true
+  changed_when: false
+  lineinfile:
+    path: '../../mkdocs.yml'
+    insertafter: '^#ansible_managed'
+    line: "      - {{ item | regex_replace('.md$', '') | replace('_', '-') }}: cluster_inventory/{{ item }}"
+  loop: '{{ cluster_inventory }}'

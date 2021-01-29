@@ -1,0 +1,87 @@
+---
+title: {{ k8s_cluster_name }}
+hide:
+  - toc
+---
+# :material-kubernetes: {{ k8s_cluster_name }}
+
+<div class="inventory-box">
+  <table>
+    <tr><th>API Endpoint</th><td>https://{{ k8s_cluster_endpoint }}</td></tr>
+    <tr><th>Cluster Zone</th><td><a href="https://my.nsone.net/#/zones/{{ k8s_cluster_fqdn }}">{{ k8s_cluster_fqdn }}</a></td></tr>
+    <tr><th>Cluster Version</th><td>{{ k8s_cluster_version}}</td></tr>
+  </table>
+</div>
+
+<div class="inventory-box">
+  <table style="width:100%">
+    <tr><th colspan="2" style="text-align:center">Quick Links</th></tr>
+    <tr>
+      <td style="text-align:center"><a href="https://grafana.{{ k8s_cluster_fqdn }}">Grafana</a></td>
+      <td style="text-align:center"><a href="https://prometheus.{{ k8s_cluster_fqdn }}">Prometheus</a></td>
+    </tr>
+    <tr>
+      <td style="text-align:center"><a href="https://alertmanager.{{ k8s_cluster_fqdn }}">AlertManager</a></td>
+      <td style="text-align:center"><a href="https://hubble.{{ k8s_cluster_fqdn }}">Hubble</a></td>
+    </tr>
+  </table>
+</div>
+
+<div style="max-width: 800px;">
+<div class="tabbed-set" data-tabs="1:{{ ansible_play_hosts | length }}">
+{% for host in groups['kube_controllers'] | union(groups['kube_workers']) %}
+<input {% if loop.first %}checked="checked"{% endif %} id="__tabbed_1_{{ host.split("-")[-1] }}" name="__tabbed_1" type="radio">
+<label for="__tabbed_1_{{ host.split("-")[-1] }}">{{ host.split("-")[-1] }}</label>
+<div class="tabbed-content"><p></p>
+<div class="md-typeset__scrollwrap">
+<div class="md-typeset__table">
+      <table style="width:100%">
+      <tbody>
+        <tr>
+          <th style="text-align:center; font-weight:bold;" colspan="2">{{ host }}</th>
+          <th style="text-align:center; font-weight:bold;" colspan="2">{% if host in groups['kube_controllers'] %} Controller {% else %} Worker {% endif %}</th>
+        </tr>
+        <tr style="text-align:center">
+          <th style="text-align:center">Private IPv4</th>
+          <td style="text-align:center">{{ hostvars[host]['host_meta_internal_ipv4'] }}</td>
+{% if host_meta_rack_position is defined %}
+          <th style="text-align:center">Rack Position</th>
+          <td style="text-align:center">{{ hostvars[host]['host_meta_rack_position'] }}</td>
+{% endif %}
+        </tr>
+        <tr>
+          <th style="text-align:center">Public IPv4</th>
+          <td style="text-align:center">{{ hostvars[host]['host_meta_external_ipv4'] }}</td>
+{% if host_meta_serial is defined %}
+          <th style="text-align:center">Serial</th>
+          <td style="text-align:center">{{ hostvars[host]['host_meta_serial'] }}</td>
+{% endif %}
+        </tr>
+        <tr>
+          <th style="text-align:center">Public IPv6</th>
+          <td style="text-align:center">{{ hostvars[host]['host_meta_external_ipv6'] }}</td>
+        <tr>
+        </tbody>
+      </table>
+</div></div><p></p> </div>
+{% endfor %}
+</div>
+
+<div style="display: flex;">
+<div class="copy-box">
+<span>Copy to clip all public IPv4</span>
+```
+{% for host in groups['kube_controllers'] | union(groups['kube_workers']) %}
+{{ hostvars[host]['host_meta_external_ipv4'] }}
+{% endfor %}
+```
+</div>
+<div class="copy-box">
+<span>Copy to clip all private IPv4</span>
+```
+{% for host in groups['kube_controllers'] | union(groups['kube_workers']) %}
+{{ hostvars[host]['host_meta_internal_ipv4'] }}
+{% endfor %}
+```
+</div>
+</div>

@@ -1,0 +1,14 @@
+---
+# This is purely informative
+# This would be the result of the ansible/roles/firewalls template
+
+location: ''
+class: ''
+env: ''
+clusterHostIPs: ''
+subclass: ''
+clusterShortName: ''
+
+netboxCIDRS:
+  site-code-1:
+  - 1.1.1.1/8

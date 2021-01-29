@@ -1,0 +1,24 @@
+---
+# This is purely informative
+# This file would be the output of ansible/roles/metadata_collector values template
+
+clusters:
+  class: submarine
+  clusterFQDN: submarine.whateveryouwant.yourfancydomain.net
+  clusterShortName:
+  env:
+  kubevip:
+  apiport:
+  location: site-code-1 # This would feed into the firewalls app
+  metallb_private_ip_pools:
+    -
+  metallb_public_ip_pools:
+    -
+  metallb_peers:
+  - peer_address: 127.0.0.1
+    peer_asn:
+    my_asn:
+  metallb_additional_pools:
+  - name:
+    pools:
+    -
